@@ -1,0 +1,56 @@
+{
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/dashboard",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard",
+      "destination": "/api/control?view=dashboard"
+    },
+    {
+      "source": "/telegram",
+      "destination": "/api/control?view=telegram"
+    },
+    {
+      "source": "/users",
+      "destination": "/api/control?view=users"
+    },
+    {
+      "source": "/affiliate",
+      "destination": "/api/control?view=affiliate"
+    },
+    {
+      "source": "/signals",
+      "destination": "/api/control?view=signals"
+    },
+    {
+      "source": "/ai-analysis",
+      "destination": "/api/control?view=ai-analysis"
+    },
+    {
+      "source": "/market-data",
+      "destination": "/api/control?view=market-data"
+    },
+    {
+      "source": "/analytics",
+      "destination": "/api/control?view=analytics"
+    },
+    {
+      "source": "/logs",
+      "destination": "/api/control?view=logs"
+    },
+    {
+      "source": "/settings",
+      "destination": "/api/control?view=settings"
+    },
+    {
+      "source": "/login",
+      "destination": "/api/control?view=login"
+    }
+  ]
+}

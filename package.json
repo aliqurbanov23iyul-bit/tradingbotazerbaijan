@@ -1,0 +1,14 @@
+{
+  "name": "quick-trade-control-center",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
