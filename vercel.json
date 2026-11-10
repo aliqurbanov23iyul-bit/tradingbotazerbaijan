@@ -52,5 +52,11 @@
       "source": "/login",
       "destination": "/api/control?view=login"
     }
-  ]
+  ],
+  "framework": null,
+  "functions": {
+    "api/control.mjs": {
+      "includeFiles": "pages/**"
+    }
+  }
 }

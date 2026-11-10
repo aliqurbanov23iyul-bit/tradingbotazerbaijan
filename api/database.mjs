@@ -9,16 +9,20 @@ export function databaseOptions(value, production = false) {
     throw new Error('DATABASE_URL must be a PostgreSQL URL with a database name.');
   }
   const sslmode = url.searchParams.get('sslmode');
+  const channelBinding = url.searchParams.get('channel_binding');
+  if (channelBinding && channelBinding !== 'require') throw new Error('Unsupported PostgreSQL channel binding mode.');
   const loopback = ['localhost','127.0.0.1','[::1]'].includes(url.hostname);
   for (const key of url.searchParams.keys()) {
-    if (!['sslmode','application_name'].includes(key)) throw new Error('Unsupported PostgreSQL URL parameter.');
+    if (!['sslmode','application_name','channel_binding'].includes(key)) throw new Error('Unsupported PostgreSQL URL parameter.');
   }
   if (sslmode && !['require','verify-ca','verify-full','disable'].includes(sslmode)) throw new Error('Unsupported PostgreSQL TLS mode.');
   if (sslmode === 'disable' && (production || !loopback)) throw new Error('PostgreSQL TLS is required.');
   url.searchParams.delete('sslmode');
+  url.searchParams.delete('channel_binding');
   return {
     connectionString: url.href,
     ssl: production || !loopback || (sslmode && sslmode !== 'disable') ? {rejectUnauthorized:true} : false,
+    enableChannelBinding: channelBinding === 'require',
     max:4, connectionTimeoutMillis:5000, query_timeout:6000, statement_timeout:5500
   };
 }
