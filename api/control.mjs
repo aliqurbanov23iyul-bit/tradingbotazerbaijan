@@ -166,7 +166,7 @@ async function readData(db, route, url) {
       db.query(`SELECT (SELECT count(*) FROM registrations) users,
         (SELECT count(*) FROM registrations WHERE status='Verified' AND enabled AND last_seen>now()-interval '30 days') active,
         (SELECT count(*) FROM signals) signals,(SELECT coalesce(sum(cents),0) FROM commissions) cents`),
-      db.query(`SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') day,
+      db.query(`SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') AS day,
         count(*) FILTER (WHERE outcome='Win') wins,count(*) FILTER (WHERE outcome='Loss') losses FROM signals
         WHERE at>=now()-interval '30 days' AND outcome IN ('Win','Loss') AND ($1='' OR asset ILIKE $1) AND ($2='' OR period::text=$2)
         GROUP BY 1 ORDER BY 1`, [f.asset,f.period]),
@@ -194,11 +194,11 @@ async function readData(db, route, url) {
     const dates = range(url);
     if (!db) return { users:[], performance:[], conversion:[], models:[], revenue:[] };
     const queries = [
-      "SELECT to_char(created_at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') day,count(*) total FROM registrations WHERE created_at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1",
-      "SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') day,count(*) FILTER (WHERE outcome='Win') wins,count(*) FILTER (WHERE outcome='Loss') losses FROM signals WHERE at BETWEEN $1 AND $2 AND outcome IN ('Win','Loss') GROUP BY 1 ORDER BY 1",
-      "SELECT to_char(created_at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') day,count(*) total,count(*) FILTER (WHERE status='Verified') verified FROM registrations WHERE created_at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1",
+      "SELECT to_char(created_at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') AS day,count(*) total FROM registrations WHERE created_at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1",
+      "SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') AS day,count(*) FILTER (WHERE outcome='Win') wins,count(*) FILTER (WHERE outcome='Loss') losses FROM signals WHERE at BETWEEN $1 AND $2 AND outcome IN ('Win','Loss') GROUP BY 1 ORDER BY 1",
+      "SELECT to_char(created_at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') AS day,count(*) total,count(*) FILTER (WHERE status='Verified') verified FROM registrations WHERE created_at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1",
       "SELECT model AS day,round(100.0*count(*) FILTER (WHERE outcome='Win')/count(*),1) accuracy FROM signals WHERE at BETWEEN $1 AND $2 AND outcome IN ('Win','Loss') GROUP BY 1 ORDER BY 1",
-      "SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') day,sum(cents)/100.0 revenue FROM commissions WHERE at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1"
+      "SELECT to_char(at AT TIME ZONE 'Asia/Baku','YYYY-MM-DD') AS day,sum(cents)/100.0 revenue FROM commissions WHERE at BETWEEN $1 AND $2 GROUP BY 1 ORDER BY 1"
     ];
     const results = await Promise.all(queries.map(sql => db.query(sql,dates)));
     return Object.fromEntries(['users','performance','conversion','models','revenue'].map((key,i) => [key,results[i].rows]));
